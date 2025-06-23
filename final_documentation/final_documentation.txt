@@ -1,0 +1,152 @@
+
+# TECHNICAL DOCUMENTATION
+
+## 1. Introduction
+
+### 1.1 Project Overview
+
+This project focuses on automating road safety inspections using deep learning to detect and segment damaged safety features such as lane lines, crash barriers, stop signs, and mile markers. The goal is to reduce the cost incurred on manual inspections for highway maintenance in India. The **YOLOv8s-seg** model has been trained to perform real-time object detection and segmentation, providing a scalable and efficient solution.
+
+### 1.2 Purpose of the Document
+
+This document provides detailed technical insights into the system architecture, data processing, model development, deployment strategy, and maintenance plan. It serves as a reference for developers, engineers, and stakeholders.
+
+### 1.3 Scope
+
+- Automate the detection of road safety features using AI.
+- Train and deploy a deep learning model for real-time highway monitoring.
+- Ensure scalability across various highway conditions in India.
+
+---
+
+## 2. System Architecture
+
+### 2.1 System Components
+
+- **Input Data**: High-resolution images and videos from highway cameras.
+- **Processing Unit**: Model trained using **YOLOv8s-seg** for segmentation.
+- **Inference Pipeline**: Real-time processing using OpenCV and Streamlit.
+- **Output**: Detection reports with identified safety issues.
+
+### 2.2 System Diagram
+
+
+(Data Collection – Image dataset acquisition → Data Annotation & Augmentation – Annotating images using Sreeni App and COCO JSON format) → (Data Preprocessing – Formatting for YOLOv8, normalizing polygon coordinates, and clamping) → (Model Training – Training YOLOv8s-seg using PyTorch on Google Colab) → (Model Evaluation – Performance assessment using mAP) → (Deployment & Visualization – Integrating with Streamlit for live predictions using OpenCV).
+
+### 2.3 Hardware & Software Requirements
+
+- **Hardware**: T4 GPU (recommended for model training) or cloud-based inference.
+- **Software Stack**: Python, PyTorch, Ultralytics YOLOv8, OpenCV, Streamlit, Jupyter Notebook (Google Colab).
+
+---
+
+## 3. Data Preparation
+
+### 3.1 Data Sources
+
+- Images and videos collected from highway vehicle dashboard cameras.
+- Labeled datasets with annotated lane markings, barriers, stop signs, and mile markers.
+
+### 3.2 Preprocessing Techniques
+
+- **Annotation & Augmentation**: Labeled and augmented using **Sreeni App**, then exported in COCO JSON format.
+- **Data Cleaning**: Removing low-quality or redundant images.
+- **Normalization**: Standardizing pixel values and normalizing polygon annotation coordinates.
+- **Clamping Coordinates**: Preventing augmented annotations from exceeding image boundaries.
+- **Data Formatting**: Converting dataset into **images, labels, and YAML** files compatible with YOLOv8s-seg.
+
+### 3.3 Data Split
+
+- **Training Set**: 70%
+- **Validation Set**: 20%
+- **Testing Set**: 10%
+
+---
+
+## 4. Model Development
+
+### 4.1 Model Selection
+
+**YOLOv8s-seg** is chosen for its high accuracy, real-time inference, and segmentation capabilities.
+
+### 4.2 Model Training
+
+- **Framework**: PyTorch
+- **Training Environment**: Google Colab (T4 GPU recommended)
+- **Epochs**: 20
+- **Image Size**: 320
+- **Batch Size**: 4
+- **Learning Rate**: 0.001
+- **Workers**: 2
+- **Training Time**: 1.812 hours for 20 epochs
+
+### 4.3 Evaluation Metrics
+
+- **mAP (mean Average Precision)**
+- **IoU (Intersection over Union)**
+
+
+### 4.4 Performance Results
+
+- **Accuracy achieved**: **74.6% mAP**
+- **Best IoU**: **0.85**
+
+---
+
+## 5. Deployment Strategy
+
+### 5.1 Inference Pipeline
+
+- Real-time video processing using OpenCV.
+- Streamlit-based dashboard for result visualization.
+
+### 5.2 Optimization
+
+- Model compression using **pruning and quantization** to reduce inference time.
+- TensorRT for hardware acceleration.
+
+### 5.3 Deployment Infrastructure
+
+- **Edge Deployment**: NVIDIA Jetson for real-time processing.
+- **Cloud Deployment**: AWS/GCP with GPU support.
+- **Web Deployment**: Streamlit interface for live predictions.
+
+---
+
+## 6. Monitoring & Maintenance
+
+### 6.1 Model Monitoring
+
+- Track model performance using feedback loops.
+- Implement automated retraining for adapting to new road conditions.
+
+### 6.2 Handling Non-Stationary Data
+
+- Update the model regularly to prevent degradation.
+
+### 6.3 System Updates & Scalability
+
+- Ensure compatibility with future hardware and software upgrades.
+
+---
+
+## 7. Risk Management & Compliance
+
+### 7.1 Potential Risks
+
+- Poor image quality affecting model accuracy.
+- Environmental factors (fog, rain) reducing detection effectiveness.
+
+### 7.2 Compliance & Regulations
+
+- Adherence to **Indian road safety regulations**.
+- Data privacy measures for handling surveillance footage.
+
+---
+
+## 8. Conclusion
+
+The proposed AI-based road inspection system using **YOLOv8s-seg** provides an **automated, scalable, and cost-effective** solution for highway safety monitoring. The deployment of this system will lead to **faster defect detection, reduced costs, and improved road safety**. Continuous monitoring and updates will ensure the model remains effective in diverse conditions.
+
+---
+

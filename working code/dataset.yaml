@@ -1,0 +1,13 @@
+names:
+- defected_lines
+- good_line
+- defected_ms
+- good_ms
+- defected_sign
+- good_sign
+- good_barriers
+- defected_barriers
+nc: 8
+test: /content/drive/MyDrive/YOLOv8_converted/test/images
+train: /content/drive/MyDrive/YOLOv8_converted/train/images
+val: /content/drive/MyDrive/YOLOv8_converted/val/images

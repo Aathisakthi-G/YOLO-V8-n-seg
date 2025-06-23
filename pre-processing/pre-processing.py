@@ -1,0 +1,131 @@
+"after getting the splitted dataset ie,images and coco jason annotation file  "
+"use this dataset preprocessing code to get the file.yamal and required labels files"
+
+!nvidia-smi  # For GPU
+
+"""# **cuda**"""
+
+import torch
+print(torch.cuda.is_available())
+
+"""# **mount drive**
+
+"""
+
+from google.colab import drive
+drive.mount('/content/drive')
+
+"""# **modules for data coversion**"""
+
+import locale
+def getpreferredencoding(do_setlocale = True):
+    return "UTF-8"
+locale.getpreferredencoding = getpreferredencoding
+!pip install ultralytics
+!pip install pycocotools
+
+"""# **code for conversion**"""
+
+import os
+import json
+from pathlib import Path
+
+def coco_to_yolo_segmentation(coco_json_path, images_dir, output_labels_dir):
+    """
+    Convert COCO JSON annotations to YOLOv8 segmentation format.
+    Args:
+        coco_json_path (str): Path to the COCO JSON file.
+        images_dir (str): Path to the images directory.
+        output_labels_dir (str): Path to the output labels directory.
+    """
+    with open(coco_json_path, 'r') as f:
+        coco_data = json.load(f)
+
+    # Prepare category mapping (COCO category ID -> YOLO class index)
+    category_mapping = {category['id']: idx for idx, category in enumerate(coco_data['categories'])}
+
+    # Process annotations
+    for image in coco_data['images']:
+        image_id = image['id']
+        image_filename = image['file_name']
+
+        # Read image dimensions
+        img_width, img_height = image['width'], image['height']
+
+        # Find all annotations for this image
+        annotations = [ann for ann in coco_data['annotations'] if ann['image_id'] == image_id]
+
+        # Prepare label file path in the output directory
+        label_path = os.path.join(output_labels_dir, f"{Path(image_filename).stem}.txt")
+        os.makedirs(output_labels_dir, exist_ok=True)
+
+        with open(label_path, 'w') as label_file:
+            for ann in annotations:
+                category_id = ann['category_id']
+                class_idx = category_mapping[category_id]
+                segmentation = ann['segmentation'][0]  # Assuming one segmentation per annotation
+
+                # Normalize segmentation points to YOLO format
+                normalized_seg = [
+                    point / dim for point, dim in zip(segmentation, [img_width, img_height] * (len(segmentation) // 2))
+                ]
+                # Apply clamping to ensure points are within [0, 1]
+                normalized_seg = [min(max(point, 0), 1) for point in normalized_seg]
+
+                normalized_seg_str = " ".join(map(str, normalized_seg))
+                label_file.write(f"{class_idx} {normalized_seg_str}\n")
+
+    print(f"Annotations for {coco_json_path} converted and saved to {output_labels_dir}")
+
+# Define the paths for your dataset
+base_dir = '/content/drive/MyDrive/splitted_dataset'
+output_base_dir = '/content/drive/MyDrive/YOLOv8_converted'  # New directory for converted annotations
+splits = ['test','train', 'val']
+
+# Convert COCO annotations to YOLOv8 format for each split
+for split in splits:
+    coco_json_path = f"{base_dir}/{split}/{split}_annotations.json"  # Path to COCO JSON for each split
+    images_dir = f"{base_dir}/{split}/images"
+    output_labels_dir = f"{output_base_dir}/{split}/labels"  # New directory for labels
+
+    coco_to_yolo_segmentation(coco_json_path, images_dir, output_labels_dir)
+
+print("COCO annotations successfully converted to YOLOv8 format and stored separately!")
+
+"""# **creating yamal**"""
+
+import os
+import json
+import yaml
+
+# Path to the COCO JSON file (example for train annotations)
+coco_json_path = input("Enter the full path of your COCO JSON file: ")  # Example: '/content/drive/MyDrive/splitted_dataset/train/train_annotations.json'
+
+# Load the COCO JSON file
+with open(coco_json_path, 'r') as f:
+    coco_data = json.load(f)
+
+# Extract class names
+class_names = [category['name'] for category in coco_data['categories']]
+
+# Prompt for output directory
+output_base_dir = input("Enter the base output directory for the converted dataset (e.g., '/content/drive/MyDrive/YOLOv8_converted/'): ")
+
+# Define the directory structure for the YAML file
+dataset_yaml = {
+    'train': os.path.join(output_base_dir, 'train/images'),
+    'val': os.path.join(output_base_dir, 'val/images'),
+    'test': os.path.join(output_base_dir, 'test/images'),
+    'nc': len(class_names),  # Number of classes
+    'names': class_names  # List of class names
+}
+
+# Path to save the YAML file
+yaml_output_path = os.path.join(output_base_dir, 'dataset.yaml')
+
+# Save the YAML file to the specified directory
+with open(yaml_output_path, 'w') as yaml_file:
+    yaml.dump(dataset_yaml, yaml_file)
+
+# Print the path of the saved YAML file
+print(f"YAML file has been saved to: {yaml_output_path}")
