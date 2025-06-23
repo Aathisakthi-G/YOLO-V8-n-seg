@@ -120,7 +120,7 @@ This project introduces an AI-driven solution to automate road safety inspection
 
 | Name | Role |
 |------|------|
-| Nobel X | AI Developer & Project Lead |
-| GPT-4o (Assistant) | Technical Advisor & Reviewer |
+| AATHISAKTHI G | AI Developer & Project Lead |
+| PITHABAS | Technical Advisor & Reviewer |
 
 ---
