@@ -26,7 +26,7 @@ This project introduces an AI-driven solution to automate road safety inspection
 | **OpenCV** | Live video feed & image preprocessing |
 | **Python** | Core logic and orchestration |
 | **Streamlit** | Web app for image/video testing |
-| **Label Studio** | Image annotation |
+| **LDigital Sreeni** | Image annotation |
 | **Pandas/Numpy** | Data handling |
 | **Matplotlib/Seaborn** | Visualizations |
 | **Google Colab** | Model training |
